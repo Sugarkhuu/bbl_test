@@ -7,7 +7,7 @@ TL = range(1983.00, stop=2019.75, step=0.25)
 OBSMAT = fill!(zeros(maximum(size(TL)), 41), NaN)
 
 # FRED data
-data_raw_fred = XLSX.readdata("data_raw/data_raw_fred.xlsx", "Data!B6:K293")
+data_raw_fred = XLSX.readdata("data_raw/data_raw_fred_new.xlsx", "Data!B6:M293")
 data = convert(Matrix{Float64}, data_raw_fred)
 timeline = range(1948, stop=2019.75, step=0.25)
 
@@ -21,6 +21,8 @@ nom_gdp = data[:, 7]
 pop_temp = data[:, 8]
 tot_hours = data[:, 9]
 nom_wage_comp = data[:, 10]
+cons_defl = data[:, 11]
+inv_defl = data[:, 12]
 
 # smooth hp trend of population to solve "best levels problem"
 # see section 3.1.3 in https://sites.google.com/site/pfeiferecon/Pfeifer_2013_Observation_Equations.pdf
@@ -46,8 +48,8 @@ end
 
 pop = hp_filter(pop_temp, 10000)[1]
 
-real_cons_pc = (nom_cons_nd + nom_cons_d + nom_cons_s) ./ (gdp_defl .* pop)
-real_inv_pc = nom_inv ./ (gdp_defl .* pop)
+real_cons_pc = (nom_cons_nd + nom_cons_d + nom_cons_s) ./ (cons_defl .* pop)
+real_inv_pc = nom_inv ./ (inv_defl .* pop)
 real_gdp_sum_pc = (nom_cons_nd + nom_cons_d + nom_cons_s + nom_inv + nom_gov_spend) ./ (gdp_defl .* pop)
 real_wage_comp = nom_wage_comp ./ gdp_defl
 
